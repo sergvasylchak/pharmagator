@@ -6,98 +6,85 @@ import com.eleks.academy.pharmagator.dataproviders.dto.ds.DSMedicineDto;
 import com.eleks.academy.pharmagator.dataproviders.dto.ds.DSMedicinesResponse;
 import com.eleks.academy.pharmagator.dataproviders.dto.ds.FilterRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
-@Qualifier("pharmacyDSDataProvider")
+@Service("pharmacyDSDataProvider")
 public class PharmacyDSDataProvider implements DataProvider {
 
-	private final WebClient dsClient;
+    private final WebClient dsClient;
 
-	@Value("${pharmagator.data-providers.apteka-ds.category-fetch-url}")
-	private String categoriesFetchUrl;
+    @Value("${pharmagator.data-providers.apteka-ds.page-size}")
+    private Long pageSize;
 
-	@Value("${pharmagator.data-providers.apteka-ds.category-path}")
-	private String categoryPath;
+    @Value("${pharmagator.data-providers.apteka-ds.root-category}")
+    private String rootCategorySlug;
 
-	@Override
-	public Stream<MedicineDto> loadData() {
-		return this.fetchCategories().stream()
-				.filter(categoryDto -> categoryDto.getName().equals("Медикаменти"))
-				.map(CategoryDto::getChildren)
-				.flatMap(Collection::stream)
-				.map(CategoryDto::getSlug)
-				.flatMap(this::fetchMedicinesByCategory);
-	}
+    @Value("${pharmagator.data-providers.apteka-ds.category-fetch-url}")
+    private String categoriesFetchUrl;
 
-	private List<CategoryDto> fetchCategories() {
-		return this.dsClient.get().uri(categoriesFetchUrl)
-				.retrieve().bodyToMono(new ParameterizedTypeReference<List<CategoryDto>>() {
-				}).block();
-	}
+    @Value("${pharmagator.data-providers.apteka-ds.category-path}")
+    private String categoryPath;
 
-	private Stream<MedicineDto> fetchMedicinesByCategory(String category) {
+    @Override
+    public Stream<MedicineDto> loadData() {
+        return this.fetchCategories()
+                .stream()
+                .filter(categoryDto -> categoryDto.getSlug().equals(this.rootCategorySlug))
+                .map(CategoryDto::getChildren)
+                .flatMap(Collection::stream)
+                .map(CategoryDto::getSlug)
+                .flatMap(this::fetchMedicinesByCategory);
+    }
 
-		Long pageSize = 100L;
+    private List<CategoryDto> fetchCategories() {
+        return this.dsClient.get().uri(this.categoriesFetchUrl)
+                .retrieve().bodyToMono(new ParameterizedTypeReference<List<CategoryDto>>() {
+                }).block();
+    }
 
-		FilterRequest filterRequest = FilterRequest.builder()
-				.page(1L)
-				.per(100L)
-				.build();
+    private Stream<MedicineDto> fetchMedicinesByCategory(String category) {
+        Function<FilterRequest, DSMedicinesResponse> fetchPage = filter ->
+                this.dsClient.post()
+                        .uri(categoryPath + "/" + category)
+                        .body(Mono.just(filter), FilterRequest.class)
+                        .retrieve()
+                        .bodyToMono(DSMedicinesResponse.class)
+                        .filter(Objects::nonNull)
+                        .map(DSMedicinesResponse.withPage(filter.getPage()))
+                        .block();
 
-		DSMedicinesResponse dsMedicinesResponse = this.dsClient.post()
-				.uri(categoryPath + "/" + category)
-				.body(Mono.just(filterRequest), FilterRequest.class)
-				.retrieve()
-				.bodyToMono(DSMedicinesResponse.class)
-				.block();
+        Predicate<DSMedicinesResponse> isNext = response ->
+                (response.getPage()) * this.pageSize < response.getTotal();
 
-		Long total;
-		if (dsMedicinesResponse != null) {
-			total = dsMedicinesResponse.getTotal();
-			long pageCount = total / pageSize;
+        return Stream.iterate(FilterRequest.start(this.pageSize), FilterRequest::next)
+                .map(fetchPage)
+                .peek(res -> log.info("PAGE {}, TOTAL {}, isNext {}", res.getPage(), res.getTotal(), (res.getPage() - 1) * this.pageSize < res.getTotal()))
+                .takeWhile(isNext)
+                .map(DSMedicinesResponse::getProducts)
+                .flatMap(Collection::stream)
+                .map(this::mapToMedicineDto);
+    }
 
-			List<DSMedicinesResponse> responseList = new ArrayList<>();
-			long page = 1L;
-			while (page <= pageCount) {
-				DSMedicinesResponse medicinesResponse = this.dsClient.post()
-						.uri(categoryPath + "/" + category)
-						.body(Mono.just(FilterRequest.builder()
-								.page(page)
-								.per(pageSize)
-								.build()), FilterRequest.class)
-						.retrieve()
-						.bodyToMono(DSMedicinesResponse.class)
-						.block();
-				responseList.add(medicinesResponse);
-				page++;
-			}
-			return responseList.stream().map(DSMedicinesResponse::getProducts)
-					.flatMap(Collection::stream)
-					.map(this::mapToMedicineDto);
-		}
-		return Stream.of();
-
-
-	}
-
-	private MedicineDto mapToMedicineDto(DSMedicineDto dsMedicineDto) {
-		return MedicineDto.builder()
-				.externalId(dsMedicineDto.getId())
-				.price(dsMedicineDto.getPrice())
-				.title(dsMedicineDto.getName())
-				.build();
-	}
+    private MedicineDto mapToMedicineDto(DSMedicineDto dsMedicineDto) {
+        return MedicineDto.builder()
+                .externalId(dsMedicineDto.getId())
+                .price(dsMedicineDto.getPrice())
+                .title(dsMedicineDto.getName())
+                .build();
+    }
 
 }

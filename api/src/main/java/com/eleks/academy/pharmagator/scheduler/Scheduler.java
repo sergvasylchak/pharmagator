@@ -21,10 +21,14 @@ public class Scheduler {
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     public void schedule() {
         log.info("Scheduler started at {}", Instant.now());
-        dataProviderList.stream().flatMap(DataProvider::loadData).forEach(this::storeToDatabase);
+
+        this.dataProviderList.stream()
+                .flatMap(DataProvider::loadData)
+                .forEach(this::storeToDatabase);
     }
 
     private void storeToDatabase(MedicineDto dto) {
-        log.info(dto.getTitle() + " - " + dto.getPrice());
+        log.info("{} - {}", dto.getTitle(), dto.getPrice());
     }
+
 }

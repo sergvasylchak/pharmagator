@@ -14,3 +14,5 @@ pharmagator:
       url: https://api-int.apteka-ds.com.ua/api/v1
       category-fetch-url: /category-menu
       category-path: /cat-prods-by-page
+      root-category: medykamenty
+      page-size: 100
