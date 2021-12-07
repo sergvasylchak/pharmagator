@@ -1,3 +1,6 @@
+server:
+  port : 8080
+
 spring:
   datasource:
     url: jdbc:postgresql:pharmagator
@@ -13,19 +16,19 @@ spring:
 
 pharmagator:
   data-providers:
-    aptslav:
-      title: apteka-slavutych
+    pharmacy-slavutych:
+      pharmacy-name: pharmacy-slavutych
       api-calls-limit: 3
       base-url: https://aptslav.com.ua:3000/api/v1
       categories-url: /categories
       medicines-uri: /categories/87/products
       medicineLinkTemplate: https://aptslav.com.ua:3000/api/v1/products/%d
       page-size: 100
-    apteka-ds:
+    pharmacy-ds:
       url: https://api-int.apteka-ds.com.ua/api/v1
       category-fetch-url: /category-menu
       category-path: /cat-prods-by-page
-      pharmacy-name: apteka-ds
+      pharmacy-name: pharmacy-ds
       page-limit: 1
       products-per-page-limit: 50
     pharmacy-anc:
@@ -33,17 +36,17 @@ pharmagator:
       category-fetch-url: /categories
       page-size: 10
       pharmacy-name: pharmacy-anc
-    apteka-liki24:
+    pharmacy-liki24:
       url: https://liki24.com/vnext/api/catalogue/8000001/products
       initial-page-index: 1
-      pharmacy-name: apteka-liki24
+      pharmacy-name: pharmacy-liki24
       page-limit: 5
-    apteka-rozetka:
+    pharmacy-rozetka:
       url: https://xl-catalog-api.rozetka.com.ua/v4
       product-ids-fetch-url: /goods/get
       products-fetch-url: /goods/getDetails
       sell-status: available
       category-id: !!str 4628621
       medicament-category-id: !!str 4628712
-      pharmacy-name: apteka-rozetka
+      pharmacy-name: pharmacy-rozetka
       page-limit: 5

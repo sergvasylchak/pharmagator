@@ -13,7 +13,8 @@ public class ExportExceptions extends RuntimeException {
     @AllArgsConstructor
     public enum Error {
         GET_PDF_WRITER_IS_BAD("Cannot get instance of PDFWriter"),
-        INVALID_FONT("Cannot create font");
+        INVALID_FONT("Cannot create font"),
+        WRITE_TO_CSV_IS_BAD("Writing data to bytes was unsuccessful");
 
         private String message;
     }

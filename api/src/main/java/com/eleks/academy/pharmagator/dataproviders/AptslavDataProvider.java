@@ -21,19 +21,13 @@ import java.util.stream.Stream;
 @Qualifier("aptslavDataProvider")
 public class AptslavDataProvider implements DataProvider {
 
-    @Value("${pharmagator.data-providers.aptslav.medicines-uri}")
+    @Value("${pharmagator.data-providers.pharmacy-slavutych.medicines-uri}")
     private String medicinesFetchUri;
 
-    @Value("${pharmagator.data-providers.aptslav.medicineLinkTemplate}")
-    private String medicineLinkTemplate;
-
-    @Value("${pharmagator.data-providers.aptslav.title}")
-    private String pharmacyTitle;
-
-    @Value("${pharmagator.data-providers.aptslav.page-size}")
+    @Value("${pharmagator.data-providers.pharmacy-slavutych.page-size}")
     private Integer pageSize;
 
-    @Value("${pharmagator.data-providers.aptslav.api-calls-limit}")
+    @Value("${pharmagator.data-providers.pharmacy-slavutych.api-calls-limit}")
     private Integer apiCallsLimit;
 
     @Qualifier("aptslavWebClient")

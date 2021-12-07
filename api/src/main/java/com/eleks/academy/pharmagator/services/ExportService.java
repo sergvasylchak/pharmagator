@@ -24,10 +24,9 @@ public class ExportService {
     private final PharmacyRepository pharmacyRepository;
 
     public XSSFWorkbook getExportData() {
-        Map<String, Map<Long, BigDecimal>> prices = priceRepository.findAllMedicinesPrices()
-                .stream()
-                .collect(Collectors.groupingBy(MedicinePrice::getTitle,
-                        Collectors.toMap(MedicinePrice::getPharmacyId, MedicinePrice::getPrice)));
+        Map<String, Map<Long, BigDecimal>> prices;
+
+        prices = getMapPricesFromDatabase();
 
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -54,6 +53,13 @@ public class ExportService {
         setupConditionalFormatting(prices, sheet);
 
         return workbook;
+    }
+
+    public Map<String, Map<Long, BigDecimal>> getMapPricesFromDatabase() {
+        return priceRepository.findAllMedicinesPrices()
+                .stream()
+                .collect(Collectors.groupingBy(MedicinePrice::getTitle,
+                        Collectors.toMap(MedicinePrice::getPharmacyId, MedicinePrice::getPrice)));
     }
 
     private void buildMedicineRow(XSSFSheet sheet, XSSFCellStyle firstColumnStyle, AtomicInteger rowIndex, HashMap<Long, Integer> pharmacyColumnMapping, String medicineTitle, Map<Long, BigDecimal> phs) {

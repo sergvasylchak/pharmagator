@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Service
 public class ApiMedicineDtoConverter implements ApiDtoConverter<AptslavMedicineDto> {
 
-    @Value("${pharmagator.data-providers.aptslav.title}")
+    @Value("${pharmagator.data-providers.pharmacy-slavutych.pharmacy-name}")
     private String pharmacyTitle;
 
     @Override

@@ -22,4 +22,9 @@ public class AdvancedSearchServiceImpl implements AdvancedSearchService {
         return repository.findAll(specification, pageable);
     }
 
+    @Override
+    public void refreshView() {
+        this.repository.refreshView();
+    }
+
 }

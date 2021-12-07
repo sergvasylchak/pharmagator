@@ -1,5 +1,6 @@
 package com.eleks.academy.pharmagator.controllers;
 
+import com.eleks.academy.pharmagator.services.CsvService;
 import com.eleks.academy.pharmagator.services.ExportService;
 import com.eleks.academy.pharmagator.services.PDFExportService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class ExportController {
 
     private final ExportService exportService;
     private final PDFExportService pdfExportService;
+    private final CsvService csvService;
 
     @SneakyThrows
     @GetMapping
@@ -41,6 +43,22 @@ public class ExportController {
     @GetMapping("/pdf")
     public ResponseEntity<ByteArrayResource> exportToPDF() {
         byte[] bytes = pdfExportService.export();
+        ByteArrayResource resource = new ByteArrayResource(bytes);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    @SneakyThrows
+    @GetMapping("/csv")
+    public ResponseEntity<ByteArrayResource> exportToCsv() {
+        byte[] bytes = csvService.export();
         ByteArrayResource resource = new ByteArrayResource(bytes);
 
         HttpHeaders headers = new HttpHeaders();

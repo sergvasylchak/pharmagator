@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" class="h-100">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Pharmagator</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body class="d-flex flex-column h-100">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main role="main" class="flex-shrink-0">
+  <div class="container mt-5">
+    <div class="jumbotron">
+      <h1 class="display-4">Price</h1>
+    </div>
+
+
+    <div th:switch="${pricesMap}">
+      <h2 th:case="null">No medicines yet!</h2>
+      <div th:case="*">
+        <table>
+          <thead>
+          <th class="background">
+            <div><span class="bottom">Medicine⬎</span>
+              <span class="top">Pharmacy&#11106;</span>
+              <div class="line"></div>
+            </div>
+          </th>
+          <th th:each="pharmacy : ${pharmacies}" th:text="${pharmacy.name}"></th>
+          </thead>
+          <tbody>
+          <tr th:each="entry1, stats1 : ${pricesMap}" th:with="prices=${entry1.value}">
+            <td th:text="${entry1.key}"></td>
+            <td th:each="pharmacy : ${pharmacies}" th:text="${prices.get(pharmacy.id)}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--            <p><a href="/signup">Add a new user</a></p>-->
+    </div>
+  </div>
+</main>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>

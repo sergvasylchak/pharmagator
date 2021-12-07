@@ -1,10 +1,7 @@
 package com.eleks.academy.pharmagator.dataproviders.dto;
 
 import com.univocity.parsers.annotations.Parsed;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 

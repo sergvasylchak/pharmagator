@@ -1,0 +1,10 @@
+<dataset>
+    <medicines id="2021112901" title="ExportServiceIT_title1"/>
+    <medicines id="2021112902" title="ExportServiceIT_title2"/>
+
+    <pharmacies id="2021112903" name="ExportServiceIT_name1" medicine_link_template="https://linktemplate.com/"/>
+    <pharmacies id="2021112904" name="ExportServiceIT_name2" medicine_link_template="https://linktemplate.com/"/>
+
+    <prices pharmacy_id="2021112903" medicine_id="2021112901" price="10.08" external_id="E1X2T3R4N5L6I7D801" />
+    <prices pharmacy_id="2021112904" medicine_id="2021112902" price="10.09" external_id="E1X2T3R4N5L6I7D802"/>
+</dataset>

@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -100,8 +101,8 @@ class AptslavDataProviderIT {
         ObjectMapper objectMapper = new ObjectMapper();
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
-                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(responseBody)));
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(objectMapper.writeValueAsString(responseBody)));
 
         ReflectionTestUtils.invokeMethod(subject, "sendGetMedicinesRequest", 100, 10);
 
@@ -123,7 +124,7 @@ class AptslavDataProviderIT {
     @Test
     void sendGetMedicinesRequest_bodyIsNull_ResponseBodyIsNullException() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
-                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         String exceptionMessage = assertThrows(ResponseBodyIsNullException.class, () -> ReflectionTestUtils.invokeMethod(subject, "sendGetMedicinesRequest", 100, 10)).getMessage();
 
@@ -158,8 +159,8 @@ class AptslavDataProviderIT {
         ObjectMapper objectMapper = new ObjectMapper();
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
-                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .setBody(objectMapper.writeValueAsString(responseBody)));
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(objectMapper.writeValueAsString(responseBody)));
 
         subject.loadData();
 
@@ -176,6 +177,18 @@ class AptslavDataProviderIT {
         assertEquals("0", getQueryParameter(request, "skip"));
 
         assertEquals("true", getQueryParameter(request, "inStock"));
+    }
+
+    @Test
+    void badRequestToApi_WebClientResponseException() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        WebClientResponseException exception = assertThrows(WebClientResponseException.class, () -> subject.loadData());
+
+        String message = exception.getMessage();
+
+        assertTrue(message.startsWith("500 Internal Server Error from GET"));
     }
 
 }

@@ -29,13 +29,13 @@ public class PharmacyLiki24DataProvider implements DataProvider {
     @Qualifier("pharmacyLiki24WebClient")
     private final WebClient webClient;
 
-    @Value("${pharmagator.data-providers.apteka-liki24.initial-page-index}")
+    @Value("${pharmagator.data-providers.pharmacy-liki24.initial-page-index}")
     private Long initialPageIndex;
 
-    @Value("${pharmagator.data-providers.apteka-liki24.pharmacy-name}")
+    @Value("${pharmagator.data-providers.pharmacy-liki24.pharmacy-name}")
     private String pharmacyName;
 
-    @Value("${pharmagator.data-providers.apteka-liki24.page-limit}")
+    @Value("${pharmagator.data-providers.pharmacy-liki24.page-limit}")
     private Long pageLimit;
 
     @Override

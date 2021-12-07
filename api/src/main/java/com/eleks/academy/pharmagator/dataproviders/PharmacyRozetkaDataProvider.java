@@ -30,25 +30,25 @@ public class PharmacyRozetkaDataProvider implements DataProvider {
     @Qualifier("pharmacyRozetkaWebClient")
     private final WebClient rozetkaClient;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.product-ids-fetch-url}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.product-ids-fetch-url}")
     private String productIdsFetchUrl;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.category-id}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.category-id}")
     private String categoryId;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.medicament-category-id}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.medicament-category-id}")
     private String medicamentCategoryId;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.sell-status}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.sell-status}")
     private String sellStatus;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.products-fetch-url}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.products-fetch-url}")
     private String productsPath;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.pharmacy-name}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.pharmacy-name}")
     private String pharmacyName;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.page-limit}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.page-limit}")
     private Long pageLimit;
 
     @Override

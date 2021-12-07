@@ -2,6 +2,7 @@ package com.eleks.academy.pharmagator.controllers;
 
 import com.eleks.academy.pharmagator.exceptions.ExportExceptions;
 import com.eleks.academy.pharmagator.exceptions.GlobalExceptionHandler;
+import com.eleks.academy.pharmagator.services.CsvServiceImpl;
 import com.eleks.academy.pharmagator.services.PDFExportService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +39,11 @@ class ExportControllerIT {
     @Mock
     private PDFExportService pdfExportService;
 
-    private final String URI = "/export/pdf";
+    @Mock
+    private CsvServiceImpl csvService;
+
+    private final String PDF_URI = "/export/pdf";
+    private final String CSV_URI = "/export/csv";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -61,7 +66,7 @@ class ExportControllerIT {
         byte[] bytes = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         when(pdfExportService.export()).thenReturn(bytes);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(URI))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(PDF_URI))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_OCTET_STREAM));
 
@@ -73,7 +78,7 @@ class ExportControllerIT {
     void exportToPdf_getPdfWriterIsBad() {
         when(pdfExportService.export()).thenThrow(new ExportExceptions(ExportExceptions.Error.GET_PDF_WRITER_IS_BAD));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(URI))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(PDF_URI))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         then(pdfExportService).should().export();
@@ -84,10 +89,34 @@ class ExportControllerIT {
     void exportToPdf_createFontIsInvalid() {
         when(pdfExportService.export()).thenThrow(new ExportExceptions(ExportExceptions.Error.INVALID_FONT));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(URI))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(PDF_URI))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         then(pdfExportService).should().export();
+    }
+
+    @Test
+    @SneakyThrows
+    void exportToCsv_isOk() {
+        byte[] bytes = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        when(csvService.export()).thenReturn(bytes);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(CSV_URI))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_OCTET_STREAM));
+
+        then(csvService).should().export();
+    }
+
+    @Test
+    @SneakyThrows
+    void exportToCsv_writeToCsvIsBad() {
+        when(csvService.export()).thenThrow(new ExportExceptions(ExportExceptions.Error.WRITE_TO_CSV_IS_BAD));
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get(CSV_URI))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        then(csvService).should().export();
     }
 
 }

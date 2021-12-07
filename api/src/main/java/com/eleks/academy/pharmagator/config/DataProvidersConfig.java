@@ -18,56 +18,39 @@ import reactor.netty.http.client.HttpClient;
 @Configuration
 public class DataProvidersConfig {
 
-    @Value("${pharmagator.data-providers.apteka-ds.url}")
+    @Value("${pharmagator.data-providers.pharmacy-ds.url}")
     private String pharmacyDSBaseUrl;
 
     @Value("${pharmagator.data-providers.pharmacy-anc.url}")
     private String pharmacyANCBaseUrl;
 
-    @Value("${pharmagator.data-providers.apteka-liki24.url}")
+    @Value("${pharmagator.data-providers.pharmacy-liki24.url}")
     private String pharmacyLiki24BaseUrl;
 
-    @Value("${pharmagator.data-providers.apteka-rozetka.url}")
+    @Value("${pharmagator.data-providers.pharmacy-rozetka.url}")
     private String pharmacyRozetkaBaseUrl;
 
-    @Value("${pharmagator.data-providers.aptslav.base-url}")
+    @Value("${pharmagator.data-providers.pharmacy-slavutych.base-url}")
     private String aptslavBaseUrl;
 
     @Bean(name = "pharmacyDSWebClient")
     public WebClient pharmacyDSWebClient() {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .baseUrl(pharmacyDSBaseUrl)
-                .build();
+        return getWebClientWithDefaultHeadersSetup(pharmacyDSBaseUrl);
     }
 
     @Bean(name = "pharmacyANCWebClient")
     public WebClient pharmacyANCWebClient() {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .baseUrl(pharmacyANCBaseUrl)
-                .build();
+        return getWebClientWithDefaultHeadersSetup(pharmacyANCBaseUrl);
     }
 
     @Bean(name = "pharmacyLiki24WebClient")
     public WebClient pharmacyLiki24WebClient() {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader("x-lang", "uk")
-                .baseUrl(pharmacyLiki24BaseUrl)
-                .build();
+        return getWebClientWithDefaultHeadersSetup(pharmacyLiki24BaseUrl);
     }
 
     @Bean(name = "pharmacyRozetkaWebClient")
     public WebClient pharmacyRozetkaWebClient() {
-        return WebClient.builder()
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .baseUrl(pharmacyRozetkaBaseUrl)
-                .build();
+        return getWebClientWithDefaultHeadersSetup(pharmacyRozetkaBaseUrl);
     }
 
     @SneakyThrows
@@ -89,6 +72,15 @@ public class DataProvidersConfig {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .clientConnector(connector)
                 .baseUrl(aptslavBaseUrl)
+                .build();
+    }
+
+    private WebClient getWebClientWithDefaultHeadersSetup(String baseUrl) {
+        return WebClient.builder()
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("x-lang", "uk")
+                .baseUrl(baseUrl)
                 .build();
     }
 
