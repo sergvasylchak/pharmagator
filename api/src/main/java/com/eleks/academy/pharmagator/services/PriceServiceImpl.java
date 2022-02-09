@@ -1,8 +1,11 @@
 package com.eleks.academy.pharmagator.services;
 
+import com.eleks.academy.pharmagator.controllers.dto.PriceAggregationRequest;
 import com.eleks.academy.pharmagator.dataproviders.dto.input.PriceDto;
 import com.eleks.academy.pharmagator.entities.Price;
 import com.eleks.academy.pharmagator.entities.PriceId;
+import com.eleks.academy.pharmagator.projections.dto.PriceAggregationItem;
+import com.eleks.academy.pharmagator.repositories.PriceJdbcRepository;
 import com.eleks.academy.pharmagator.repositories.PriceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +16,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class PriceServiceImpl implements PriceService {
 
     private final PriceRepository priceRepository;
+    private final PriceJdbcRepository priceJdbcRepository;
 
     private final ModelMapper modelMapper;
 
@@ -55,6 +59,11 @@ public class PriceServiceImpl implements PriceService {
         } catch (EmptyResultDataAccessException exception) {
             log.info(exception.getMessage(), exception);
         }
+    }
+
+    @Override
+    public List<PriceAggregationItem<String>> findAllAggregated(PriceAggregationRequest request) {
+        return this.priceJdbcRepository.findAllAggregated(request);
     }
 
 }
